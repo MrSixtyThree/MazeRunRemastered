@@ -33,7 +33,27 @@ public class UIController : MonoBehaviour
     [SerializeField] GameObject GameOverEscapedPanel;
     [SerializeField] TextMeshProUGUI PointsText;
 
-    string activePlayerName;
+    // Upgrade Point Cost Text References
+    [SerializeField] TextMeshProUGUI upgradeMovementSpeedCostText;
+    [SerializeField] TextMeshProUGUI upgradeTotalHealthCostText;
+    [SerializeField] TextMeshProUGUI upgradePistolDamageCostText;
+    [SerializeField] TextMeshProUGUI upgradePistolFireRateCostText;
+    [SerializeField] TextMeshProUGUI upgradePistolAccuracyCostText;
+    [SerializeField] TextMeshProUGUI upgradePistolMagazineSizeCostText;
+    [SerializeField] TextMeshProUGUI upgradePistolReloadCostText;
+    [SerializeField] TextMeshProUGUI upgradeMGDamageCostText;
+    [SerializeField] TextMeshProUGUI upgradeMGFireRateCostText;
+    [SerializeField] TextMeshProUGUI upgradeMGAccuracyCostText;
+    [SerializeField] TextMeshProUGUI upgradeMGMagazineSizeCostText;
+    [SerializeField] TextMeshProUGUI upgradeMGReloadCostText;
+    [SerializeField] TextMeshProUGUI upgradeShotgunDamageCostText;
+    [SerializeField] TextMeshProUGUI upgradeShotgunFireRateCostText;
+    [SerializeField] TextMeshProUGUI upgradeShotgunAccuracyCostText;
+    [SerializeField] TextMeshProUGUI upgradeShotgunMagazineSizeCostText;
+    [SerializeField] TextMeshProUGUI upgradeShotgunReloadCostText;
+
+
+    public string activePlayerName;
     public UserData activePlayer;
 
     public int MazeHeight;
@@ -45,6 +65,16 @@ public class UIController : MonoBehaviour
     public string difficulty;
     public bool popupPresence = false;
     public int interval = 0;
+
+    // Upgrade Variables
+    public float growthRate = 1.3f;
+    public float baseCostMovementSpeed = 30;
+    public float baseCostDamage = 30;
+    public float baseCostAccuracy = 30;
+    public float baseCostFireRate = 30;
+    public float baseCostMagazineSize = 30;
+    public float baseCostReload = 30;
+
 
     private void Start()
     {
@@ -173,7 +203,7 @@ public class UIController : MonoBehaviour
         shop_tab2.gameObject.SetActive(false);
         shop_tab3.gameObject.SetActive(false);
         shop_tab4.gameObject.SetActive(false);
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void setPointsDisplay()
@@ -211,6 +241,7 @@ public class UIController : MonoBehaviour
             difficultyPanel.gameObject.SetActive(true);
 
             activePlayer = SaveController.GetComponent<SaveAndLoad>().Load(activePlayerName);
+            
         }
     }
 
@@ -229,6 +260,7 @@ public class UIController : MonoBehaviour
             difficultyPanel.gameObject.SetActive(true);
 
             activePlayer = new UserData(name);
+            SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
         }
         else
         {
@@ -443,7 +475,7 @@ public class UIController : MonoBehaviour
 
     public void shopPersonalUpgrades()
     {
-        setPointsDisplay();
+        updateAllPointsText();
         shop_tab1.gameObject.SetActive(true);
         shop_tab2.gameObject.SetActive(false);
         shop_tab3.gameObject.SetActive(false);
@@ -451,7 +483,7 @@ public class UIController : MonoBehaviour
     }
     public void shopPistolUpgrades()
     {
-        setPointsDisplay();
+        updateAllPointsText();
         shop_tab1.gameObject.SetActive(false);
         shop_tab2.gameObject.SetActive(true);
         shop_tab3.gameObject.SetActive(false);
@@ -460,7 +492,7 @@ public class UIController : MonoBehaviour
 
     public void shopMGUpgrades()
     {
-        setPointsDisplay();
+        updateAllPointsText();
         if (activePlayer.isMGUnlocked())
         {
             shop_tab1.gameObject.SetActive(false);
@@ -481,7 +513,7 @@ public class UIController : MonoBehaviour
     }
     public void shopShotgunUpgrades()
     {
-        setPointsDisplay();
+        updateAllPointsText();
         if (activePlayer.isShotgunUnlocked())
         {
             shop_tab1.gameObject.SetActive(false);
@@ -502,7 +534,8 @@ public class UIController : MonoBehaviour
     }
     public void upgradeMovementSpeed()
     {
-        int pointValue = (int)(((activePlayer.getMovementSpeed() * 5) + 1) * 30);
+        int pointValue = findUpgradeCost("upgradeMovementSpeed");
+
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -516,29 +549,16 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
-    }
-    public void upgradeEvolveRate()
-    {
-        int pointValue = (int)(((activePlayer.getEvolveRate() * 5) + 1) * 20);
-        if (activePlayer.getPoints() >= pointValue)
-        {
-            activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setEvolveRate(activePlayer.getEvolveRate() + 0.1f);
+        // Update UI
+        updateAllPointsText();
 
-            popup("Evolve Rate Upgraded!!");
-        }
-        else
-        {
-            string output = pointValue + " points needed!";
-            popup(output);
-        }
 
-        setPointsDisplay();
     }
+
+
     public void upgradeMaxHealth()
     {
-        int pointValue = (int)activePlayer.getMaxHealth() * 50;
+        int pointValue = findUpgradeCost("upgradeMaxHealth");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -552,15 +572,17 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        // Update UI
+        updateAllPointsText();
     }
+
     public void upgradePistolDamage()
     {
-        int pointValue = (int)(((activePlayer.getPistolDamage() * 5) + 1) * 15);
+        int pointValue = findUpgradeCost("upgradePistolDamage");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setPistolDamage(activePlayer.getPistolDamage() + 0.3f);
+            activePlayer.setPistolDamage(activePlayer.getPistolDamage() + 0.5f);
 
             popup("Pistol Damage Upgraded");
         }
@@ -570,15 +592,15 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
     public void upgradePistolAccuracy()
     {
-        int pointValue = (int)(((activePlayer.getPistolAccuracy() * 5) + 1) * 12);
+        int pointValue = findUpgradeCost("upgradePistolAccuracy");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setPistolAccuracy(activePlayer.getPistolAccuracy() + 0.4f);
+            activePlayer.setPistolAccuracy(activePlayer.getPistolAccuracy() + 0.5f);
 
             popup("Pistol Accuracy Upgraded");
         }
@@ -588,16 +610,16 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradePistolFireRate()
     {
-        int pointValue = (int)(((activePlayer.getPistolFireRate() * 5) + 1) * 20);
+        int pointValue = findUpgradeCost("upgradePistolFireRate");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setPistolFireRate(activePlayer.getPistolFireRate() + 0.3f);
+            activePlayer.setPistolFireRate(activePlayer.getPistolFireRate() + 0.4f);
 
             popup("Pistol Fire Rate Upgraded");
         }
@@ -607,16 +629,16 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradePistolMagazineSize()
     {
-        int pointValue = (int)(((activePlayer.getPistolMag() * 5) + 1) * 15);
+        int pointValue = findUpgradeCost("upgradePistolMagazineSize");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setPistolMag(activePlayer.getPistolMag() + 0.3f);
+            activePlayer.setPistolMag(activePlayer.getPistolMag() + 0.2f);
 
             popup("Pistol Magazine Upgraded");
         }
@@ -626,16 +648,16 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradePistolReload()
     {
-        int pointValue = (int)(((activePlayer.getPistolReload() * 5) + 1) * 25);
+        int pointValue = findUpgradeCost("upgradePistolReload");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setPistolReload(activePlayer.getPistolReload() + 0.3f);
+            activePlayer.setPistolReload(activePlayer.getPistolReload() + 0.4f);
 
             popup("Pistol Reload Upgraded");
         }
@@ -645,11 +667,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
+
     public void upgradeMGDamage()
     {
-        int pointValue = (int)(((activePlayer.getMGDamage() * 5) + 1) * 15);
+        int pointValue = findUpgradeCost("upgradeMGDamage");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -663,11 +686,11 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
     public void upgradeMGAccuracy()
     {
-        int pointValue = (int)(((activePlayer.getMGAccuracy() * 5) + 1) * 12);
+        int pointValue = findUpgradeCost("upgradeMGAccuracy");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -681,12 +704,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeMGFireRate()
     {
-        int pointValue = (int)(((activePlayer.getMGFireRate() * 5) + 1) * 20);
+        int pointValue = findUpgradeCost("upgradeMGFireRate");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -700,12 +723,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeMGMagazineSize()
     {
-        int pointValue = (int)(((activePlayer.getMGMag() * 5) + 1) * 15);
+        int pointValue = findUpgradeCost("upgradeMGMagazineSize");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -719,12 +742,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeMGReload()
     {
-        int pointValue = (int)(((activePlayer.getMGReload() * 5) + 1) * 25);
+        int pointValue = findUpgradeCost("upgradeMGReload");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -738,12 +761,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeShotgunDamage()
     {
-        int pointValue = (int)(((activePlayer.getShotgunDamage() * 5) + 1) * 15);
+        int pointValue = findUpgradeCost("upgradeShotgunDamage");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -757,11 +780,11 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
     public void upgradeShotgunAccuracy()
     {
-        int pointValue = (int)(((activePlayer.getShotgunAccuracy() * 5) + 1) * 12);
+        int pointValue = findUpgradeCost("upgradeShotgunAccuracy");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -775,12 +798,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeShotgunFireRate()
     {
-        int pointValue = (int)(((activePlayer.getShotgunFireRate() * 5) + 1) * 20);
+        int pointValue = findUpgradeCost("upgradeShotgunFireRate");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -794,12 +817,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeShotgunMagazineSize()
     {
-        int pointValue = (int)(((activePlayer.getShotgunMag() * 5) + 1) * 15);
+        int pointValue = findUpgradeCost("upgradeShotgunMagazineSize");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -813,12 +836,12 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
-        setPointsDisplay();
+        updateAllPointsText();
     }
 
     public void upgradeShotgunReload()
     {
-        int pointValue = (int)(((activePlayer.getShotgunReload() * 5) + 1) * 25);
+        int pointValue = findUpgradeCost("upgradeShotgunReload");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
@@ -832,6 +855,95 @@ public class UIController : MonoBehaviour
             popup(output);
         }
 
+        updateAllPointsText();
+    }
+
+    // Function to calculate upgrade cost for upgrades and for updating text
+    public int findUpgradeCost(string upgradeName)
+    {
+        switch (upgradeName)
+        {
+            // Player Upgrades
+            case "upgradeMovementSpeed":
+                return (int)(baseCostMovementSpeed * Mathf.Pow(activePlayer.getMovementSpeed(), growthRate));
+
+            case "upgradeMaxHealth":
+                return (int)(activePlayer.getMaxHealth() * 40);
+            
+            // Pistol Upgrades
+            case "upgradePistolDamage":
+                return (int)(baseCostDamage * Mathf.Pow(activePlayer.getPistolDamage(), growthRate));
+            
+            case "upgradePistolAccuracy":
+                return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getPistolAccuracy(), growthRate));
+            
+            case "upgradePistolFireRate":
+                return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getPistolFireRate(), growthRate));
+
+            case "upgradePistolMagazineSize":
+                return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getPistolMag(), growthRate));
+
+            case "upgradePistolReload":
+                return (int)(baseCostReload * Mathf.Pow(activePlayer.getPistolReload(), growthRate));
+
+            // Machine Gun Upgrades
+            case "upgradeMGDamage":
+                return (int)(baseCostDamage * Mathf.Pow(activePlayer.getMGDamage(), growthRate));
+
+            case "upgradeMGAccuracy":
+                return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getMGAccuracy(), growthRate));
+
+            case "upgradeMGFireRate":
+                return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getMGFireRate(), growthRate));
+            
+            case "upgradeMGMagazineSize":
+                return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getMGMag(), growthRate));
+
+            case "upgradeMGReload":
+                return (int)(baseCostReload * Mathf.Pow(activePlayer.getMGReload(), growthRate));
+
+            // Shotgun Upgrades
+            case "upgradeShotgunDamage":
+                return (int)(baseCostDamage * Mathf.Pow(activePlayer.getShotgunDamage(), growthRate));
+            
+            case "upgradeShotgunAccuracy":
+                return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getShotgunAccuracy(), growthRate));
+            
+            case "upgradeShotgunFireRate":
+                return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getShotgunFireRate(), growthRate));
+            
+            case "upgradeShotgunMagazineSize":
+                return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getShotgunMag(), growthRate));
+
+            case "upgradeShotgunReload":
+                return (int)(baseCostReload * Mathf.Pow(activePlayer.getShotgunReload(), growthRate));
+
+            // Default case for incorrect string
+            default:
+                return -1;
+        }
+    }
+
+    // Update All UI Points Text in Shop
+    public void updateAllPointsText()
+    {
         setPointsDisplay();
+        upgradeMovementSpeedCostText.text = findUpgradeCost("upgradeMovementSpeed").ToString();
+        upgradeTotalHealthCostText.text = findUpgradeCost("upgradeMaxHealth").ToString();
+        upgradePistolDamageCostText.text = findUpgradeCost("upgradePistolDamage").ToString();
+        upgradePistolAccuracyCostText.text = findUpgradeCost("upgradePistolAccuracy").ToString();
+        upgradePistolFireRateCostText.text = findUpgradeCost("upgradePistolFireRate").ToString();
+        upgradePistolMagazineSizeCostText.text = findUpgradeCost("upgradePistolMagazineSize").ToString();
+        upgradePistolReloadCostText.text = findUpgradeCost("upgradePistolReload").ToString();
+        // upgradeMGDamageCostText.text = findUpgradeCost("upgradeMGDamage").ToString();
+        // upgradeMGAccuracyCostText.text = findUpgradeCost("upgradeMGAccuracy").ToString();
+        // upgradeMGFireRateCostText.text = findUpgradeCost("upgradeMGFireRate").ToString();
+        // upgradeMGMagazineSizeCostText.text = findUpgradeCost("upgradeMGMagazineSize").ToString();
+        // upgradeMGReloadCostText.text = findUpgradeCost("upgradeMGReload").ToString();
+        // upgradeShotgunDamageCostText.text = findUpgradeCost("upgradeShotgunDamage").ToString();
+        // upgradeShotgunAccuracyCostText.text = findUpgradeCost("upgradeShotgunAccuracy").ToString();
+        // upgradeShotgunFireRateCostText.text = findUpgradeCost("upgradeShotgunFireRate").ToString();
+        // upgradeShotgunMagazineSizeCostText.text = findUpgradeCost("upgradeShotgunMagazineSize").ToString();
+        // upgradeShotgunReloadCostText.text = findUpgradeCost("upgradeShotgunReload").ToString();
     }
 }

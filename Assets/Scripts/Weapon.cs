@@ -28,7 +28,7 @@ public class Weapon : MonoBehaviour
     private Vector3 gunDefaultPosition;
     private Quaternion gunDefaultRotation;
     private Vector3 gunReloadPosition = new Vector3(0.5f, -0.5f, 1.2f);
-    private Vector3 gunReloadRotation;
+    private Quaternion gunReloadRotation;
     private float shakeIntensity;
     private Vector3 camOriginPosition;
     private Quaternion camOriginRotation;
@@ -58,13 +58,15 @@ public class Weapon : MonoBehaviour
 
     private void Start()
     {
+        activePlayer = GameObject.Find("Menu Controller").GetComponent<UIController>().activePlayer;
+
         setWeaponType(weapon); // Default to pistol
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         currentMagazineAmmo = magazineSize;
         canShoot = true;
-        activePlayer = GameObject.Find("Menu Controller").GetComponent<UIController>().activePlayer;
+
     }
 
     void Update()
@@ -89,6 +91,11 @@ public class Weapon : MonoBehaviour
         // Shoot
         if (canShoot && isShooting && !isReloading && currentMagazineAmmo > 0)
         {
+            StopCoroutine("moveWeapon");
+            StopCoroutine("rotateWeapon");
+            currentWeapon.transform.localRotation = gunDefaultRotation;
+            currentWeapon.transform.localPosition = gunDefaultPosition;
+
             bulletsShot = bulletsPerShot;
             RayCastShoot();
         }
@@ -188,7 +195,7 @@ public class Weapon : MonoBehaviour
                 currentWeapon = Instantiate(pistolPrefab, weaponAttachmentPoint);
                 currentWeapon.transform.localPosition = new Vector3(-0.1f, -0.4f, -0.1f);
                 currentWeapon.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                gunReloadRotation = new Vector3(90f, -30f, 0f);
+                gunReloadRotation = Quaternion.Euler(90f, -30f, 0f);
                 break;
             case WeaponType.MachineGun:
                 weaponName = "Machine Gun";
@@ -203,7 +210,7 @@ public class Weapon : MonoBehaviour
                 currentWeapon = Instantiate(machineGunPrefab, weaponAttachmentPoint);
                 currentWeapon.transform.localPosition = new Vector3 (-0.1f, -0.3f, 0.4f);
                 currentWeapon.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-                gunReloadRotation = new Vector3(-20f, 0f, 0f);
+                gunReloadRotation = Quaternion.Euler(-20f, 0f, 0f);
                 break;
             case WeaponType.Shotgun:
                 weaponName = "Shotgun";
@@ -218,7 +225,7 @@ public class Weapon : MonoBehaviour
                 currentWeapon = Instantiate(shotgunPrefab, weaponAttachmentPoint);
                 currentWeapon.transform.localPosition = new Vector3(-0.2f, -0.2f, 1f);
                 currentWeapon.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                gunReloadRotation = new Vector3(70f, 0f, 0f);
+                gunReloadRotation = Quaternion.Euler(70f, 0f, 0f);
                 break;
         }
 
@@ -230,6 +237,9 @@ public class Weapon : MonoBehaviour
 
     protected void RayCastShoot()
     {
+        // Debug Line for Upgrade Application
+        Debug.Log("Damage: " + damage + " Fire Rate: " + fireRate + " Bullet Spread: " + bulletSpread + " Magazine Size: " + magazineSize + " Reload Time: " + reloadTime);
+
         canShoot = false;
 
         // Bullet spread
@@ -275,19 +285,38 @@ public class Weapon : MonoBehaviour
 
     public void Reload()
     {
+        if (isReloading) return; // Prevent multiple reload attempts
         isReloading = true;
-        StopCoroutine("moveWeapon");
-        StartCoroutine(moveWeapon(gunReloadPosition));
-        StartCoroutine(rotateWeapon(gunReloadRotation));
-        Invoke("FinishReload", reloadTime);
+
+        StopAllCoroutines();
+
+        StartCoroutine(ReloadRoutine());        
     }
 
+    private IEnumerator ReloadRoutine()
+    {
+        var routines = new []
+        {
+            StartCoroutine(rotateWeapon(gunReloadRotation)),
+            //StartCoroutine(moveWeapon(gunReloadPosition))
+        };
+        
+        foreach (var routine in routines)
+        {
+            yield return routine;
+        }
+
+        currentWeapon.transform.localRotation = gunReloadRotation;
+        currentWeapon.transform.localPosition = gunReloadPosition;
+
+        FinishReload();
+    }
     public void FinishReload()
     {
-        StopCoroutine("moveWeapon");
+
         currentWeapon.transform.localRotation = gunDefaultRotation;
         currentWeapon.transform.localPosition = gunDefaultPosition;
-        StartCoroutine(moveWeapon(gunDefaultPosition));
+
         currentMagazineAmmo = magazineSize;
         isReloading = false;
     }
@@ -297,62 +326,87 @@ public class Weapon : MonoBehaviour
         canShoot = true;
     }
 
-    public void upgradeDamage(float change)
-    {
-        damage = damage + (damage * change);
-    }
+    // public void upgradeDamage(float change)
+    // {
+    //     damage = damage + (damage * change);
+    // }
 
-    public void upgradeReloadSpeed(float change)
-    {
-        reloadTime = reloadTime - (reloadTime * change);
-    }
+    // public void upgradeReloadSpeed(float change)
+    // {
+    //     reloadTime = reloadTime - (reloadTime * change);
+    // }
 
-    public void upgradeMagazineSize(float change)
-    {
-        magazineSize = magazineSize + (int)(magazineSize * change);
-    }
-    public void upgradeAccuracy(float change)
-    {
-        bulletSpread = bulletSpread - (bulletSpread * change);
-    }
+    // public void upgradeMagazineSize(float change)
+    // {
+    //     magazineSize = magazineSize + (int)(magazineSize * change);
+    // }
+    // public void upgradeAccuracy(float change)
+    // {
+    //     bulletSpread = bulletSpread - (bulletSpread * change);
+    // }
 
     IEnumerator moveWeapon(Vector3 targetPos)
     {
-        while(currentWeapon.transform.localPosition != targetPos)
-        {
-            currentWeapon.transform.localPosition = Vector3.MoveTowards(currentWeapon.transform.localPosition, targetPos, 0.1f* Time.deltaTime); // Move to target position
-            yield return new WaitForSeconds(0.1f);
-        }
-        yield return null;
-    }
-    IEnumerator rotateWeapon(Vector3 targetRot)
-    {
-        Quaternion startRotation = currentWeapon.transform.localRotation;
-        Quaternion targetRotation = Quaternion.Euler(targetRot);
-
+        Vector3 startPosition = currentWeapon.transform.localPosition;
         float elapsedTime = 0f;
-        float rotationDuration = 0.7f;
+        float duration = reloadTime * 0.5f; // Duration proportional to reload time
 
-        while (elapsedTime < rotationDuration)
+        while (elapsedTime < duration)
         {
-            currentWeapon.transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, elapsedTime / rotationDuration);
             elapsedTime += Time.deltaTime;
+            currentWeapon.transform.localPosition = Vector3.Lerp(startPosition, targetPos, elapsedTime / duration);
+
+            if (Vector3.Distance(currentWeapon.transform.localPosition, targetPos) < 0.001f)
+            {
+                break; // Prevent endless loop if already at the target
+            }
+
             yield return null;
         }
 
-        currentWeapon.transform.localRotation = targetRotation;
+        currentWeapon.transform.localPosition = targetPos; // Snap to target position
+    }
+    IEnumerator rotateWeapon(Quaternion targetRot)
+    {
+        Quaternion startRotation = currentWeapon.transform.localRotation;
+        Quaternion targetRotation = targetRot;
+
+        float elapsedTime = 0f;
+        float duration = reloadTime * 0.5f; // Duration proportional to reload time
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            currentWeapon.transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, elapsedTime / duration);
+
+            if (Quaternion.Angle(currentWeapon.transform.localRotation, targetRotation) < 0.1f)
+            {
+                break; // Prevent endless loop if already at the target
+            }
+
+            yield return null;
+        }
+
+        currentWeapon.transform.localRotation = targetRotation; // Snap to target rotation
     }
 
     public void applyUserData()
     {
+        Debug.Log("Applying upgrades to: " + activePlayer.ToString());
+
+
+        if (activePlayer == null || activePlayer.playerName == "")
+        {
+            activePlayer = GameObject.Find("Menu Controller").GetComponent<UIController>().activePlayer;
+        }
         switch (weapon)
         {
             case WeaponType.Pistol:
-                damage = damage + damage * activePlayer.getPistolDamage();
-                fireRate = fireRate + fireRate * activePlayer.getPistolFireRate();
-                bulletSpread = bulletSpread - bulletSpread * activePlayer.getPistolAccuracy();
-                magazineSize = magazineSize + (int)(magazineSize * activePlayer.getPistolMag());
-                reloadTime = reloadTime - reloadTime * activePlayer.getPistolReload();
+                damage *= activePlayer.getPistolDamage();
+                fireRate /= activePlayer.getPistolFireRate();
+                bulletSpread /= activePlayer.getPistolAccuracy();
+                magazineSize = (int)(magazineSize * activePlayer.getPistolMag());
+                reloadTime /= activePlayer.getPistolReload();
                 break;
 
             case WeaponType.MachineGun:

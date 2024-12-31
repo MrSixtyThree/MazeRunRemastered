@@ -43,25 +43,25 @@ public class UserData
         this.points = 0;
 
         this.PistolUnlocked = true;
-        this.PistolDamage = 0.0f;
-        this.PistolFireRate = 0.0f;
-        this.PistolAccuracy = 0.0f;
-        this.PistolMagSize = 0.0f;
-        this.PistolReloadTime = 0.0f;
+        this.PistolDamage = 1.0f;
+        this.PistolFireRate = 1.0f;
+        this.PistolAccuracy = 1.0f;
+        this.PistolMagSize = 1.0f;
+        this.PistolReloadTime = 1.0f;
 
         this.MGUnlocked = false;
-        this.MGDamage = 0.0f;
-        this.MGFireRate = 0.0f;
-        this.MGAccuracy = 0.0f;
-        this.MGMagSize = 0.0f;
-        this.MGReloadTime = 0.0f;
+        this.MGDamage = 1.0f;
+        this.MGFireRate = 1.0f;
+        this.MGAccuracy = 1.0f;
+        this.MGMagSize = 1.0f;
+        this.MGReloadTime = 1.0f;
 
         this.ShotgunUnlocked = false;
-        this.ShotgunDamage = 0.0f;
-        this.ShotgunFireRate = 0.0f;
-        this.ShotgunAccuracy = 0.0f;
-        this.ShotgunMagSize = 0.0f;
-        this.ShotgunReloadTime = 0.0f;
+        this.ShotgunDamage = 1.0f;
+        this.ShotgunFireRate = 1.0f;
+        this.ShotgunAccuracy = 1.0f;
+        this.ShotgunMagSize = 1.0f;
+        this.ShotgunReloadTime = 1.0f;
     }
     public UserData(string playerName, float movementSpeed, float evolveRate, int maxHealth, int points, bool pistolUnlocked, float pistolDamage, float pistolFireRate, float pistolAccuracy, float pistolMagSize, float pistolReloadTime, bool mGUnlocked, float dMGamage, float mGFireRate, float mGAccuracy, float mGMagSize, float mGReloadTime, bool shotgunUnlocked, float shotgunDamage, float shotgunFireRate, float shotgunAccuracy, float shotgunMagSize, float shotgunReloadTime)
     {
@@ -217,6 +217,7 @@ public class UserData
     }
     public void setPistolDamage(float f)
     {
+        Debug.Log("Setting Pistol Damage to: " + f);
         this.PistolDamage = f;
     }
     public void setPistolFireRate(float f)
