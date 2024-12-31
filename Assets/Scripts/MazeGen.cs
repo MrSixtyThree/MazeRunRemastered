@@ -79,6 +79,23 @@ public class MazeGen : MonoBehaviour
         entitiesObject = GameObject.FindGameObjectWithTag("Entities");
     }
 
+    public void resetDuplicatePrevention()
+    {
+        duplicatePrevention.Clear();
+        // Add the starting cell and adjacent cells to the duplicate prevention list 
+        // to ensure enemies don't spawn on the player
+        duplicatePrevention.Add(new coordinates { x = 0, y = 0 });
+        duplicatePrevention.Add(new coordinates { x = 0, y = 1 });
+        duplicatePrevention.Add(new coordinates { x = 0, y = 2 });
+        duplicatePrevention.Add(new coordinates { x = 1, y = 0 });
+        duplicatePrevention.Add(new coordinates { x = 1, y = 1 });
+        duplicatePrevention.Add(new coordinates { x = 1, y = 2 });
+        duplicatePrevention.Add(new coordinates { x = 2, y = 0 });
+        duplicatePrevention.Add(new coordinates { x = 2, y = 1 });
+        duplicatePrevention.Add(new coordinates { x = 2, y = 2 });
+
+    }
+
     public void clearMaze()
     {
         DestroyImmediate(entitiesObject);
@@ -89,6 +106,23 @@ public class MazeGen : MonoBehaviour
         entitiesObject = new GameObject();
         entitiesObject.tag = "Entities";
         entitiesObject.name = "Entities";
+
+        // Reset the duplicate prevention list
+        resetDuplicatePrevention();
+
+        showMaze();
+    }
+
+    public void hideMaze()
+    {
+        mazeObject.SetActive(false);
+        entitiesObject.SetActive(false);
+    }
+
+    public void showMaze()
+    {
+        mazeObject.SetActive(true);
+        entitiesObject.SetActive(true);
     }
 
     void populate()
@@ -772,6 +806,7 @@ public class MazeGen : MonoBehaviour
         grid = new RoomCell[MazeHeight, MazeWidth];
         populate();
         mazeLogic(difficulty);
+    
 
         coordinates artifactLocation;
         artifactLocation.x = Random.Range(MazeHeight / 2, MazeHeight);
@@ -807,6 +842,9 @@ public class MazeGen : MonoBehaviour
         }
 
         surface.BuildNavMesh();
+
+        resetDuplicatePrevention();
+
         createPlayer();
         createArtifact(artifactLocation, value);
         
@@ -839,20 +877,19 @@ public class MazeGen : MonoBehaviour
     {
         GameObject player = Instantiate(playerObject); // Declan added this to create player
 
-        //GameObject player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         coordinates pos = new coordinates { x = 0, y = 0 };
 
         player.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
-        player.transform.SetPositionAndRotation(new Vector3((cellSize * pos.x), 2.0f, (cellSize * pos.y)), Quaternion.Euler(new Vector3(0, 0, 0)));
+        player.transform.SetPositionAndRotation(new Vector3((pos.x), 1.0f, (pos.y)), Quaternion.Euler(new Vector3(0, 0, 0)));
+        Debug.Log("Player Position: " + pos.x + ", " + pos.y);
+        Debug.Log("Player Position Real: " + player.transform.position);
         player.GetComponent<Renderer>().material.SetColor("_Color", new Color(1.0f, 1.0f, 1.0f));
-        //player.AddComponent<NavMeshAgent>();
         player.GetComponent<CapsuleCollider>().isTrigger = true;
         player.tag = "Player";
         player.transform.parent = GameObject.FindGameObjectWithTag("Entities").transform;
         player.layer = 7;
 
         player.gameObject.GetComponent<Weapon>().setWeaponType(selectedWeapon);
-        //playerObject = player;
     }
 
     public void setWeaponPistol()
@@ -861,6 +898,7 @@ public class MazeGen : MonoBehaviour
     }
     public void setWeaponMachineGun()
     {
+        
         selectedWeapon = Weapon.WeaponType.MachineGun;
     }
     public void setWeaponShotgun()
@@ -871,57 +909,50 @@ public class MazeGen : MonoBehaviour
     public void addEnemy()
     {
         GameObject enemy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        coordinates pos = new coordinates { x = 0, y = 0};
-        bool noDuplicates = false;
+        coordinates pos = new coordinates { x = 0, y = 0 };
+        Vector3 tempEnemyPosition = Vector3.zero;
+        bool validPositionFound = false;
 
-
-        while (!noDuplicates)
+        // Attempt to find a non-duplicate position
+        while (!validPositionFound)
         {
-            noDuplicates = true;
-
-            if (flipFlop == true)
+            if (flipFlop)
             {
                 pos.x = Random.Range(MazeHeight / 2, MazeHeight);
                 pos.y = Random.Range(0, MazeWidth);
-
             }
-            else if (flipFlop == false)
+            else
             {
                 pos.x = Random.Range(0, MazeHeight);
                 pos.y = Random.Range(MazeWidth / 2, MazeWidth);
             }
             flipFlop = !flipFlop;
 
-            // Check to ensure far enough away from player
+            tempEnemyPosition = new Vector3(cellSize * pos.x, 1.0f, cellSize * pos.y);
 
-            Vector3 tempEnemyPosition = new Vector3((cellSize * pos.x), 1.0f, (cellSize * pos.y));
-            //Debug.Log(tempEnemyPosition);
-            Vector3 playerPos = playerObject.transform.position;
-            //Debug.Log(playerPos);
-            float distanceToPlayer = Vector3.Distance(tempEnemyPosition, playerPos);
-            //Debug.Log(distanceToPlayer);
-
-            float spawnDistThreshold = 5.0f; // Do not increase past 10.0f as 'Easy' map won't load if its any bigger
-
-            if (distanceToPlayer < spawnDistThreshold)
+            // Check for duplicate positions
+            validPositionFound = true;
+            foreach (coordinates duplicate in duplicatePrevention)
             {
-                noDuplicates = false;
+                if (duplicate.x == pos.x && duplicate.y == pos.y)
+                {
+                    validPositionFound = false;
+                    break;
+                }
             }
 
-            // Check for duplicate enemies
-
-            for (int i = 0; i < duplicatePrevention.Count; i++)
+            if (validPositionFound)
             {
-                if ((duplicatePrevention[i].x == pos.x) && (duplicatePrevention[i].y == pos.y))
-                {
-                    noDuplicates = false;
-                }
+                duplicatePrevention.Add(pos);
+                break;
             }
         }
 
-
+        // Set up the enemy when the position is confirmed
         enemy.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
-        enemy.transform.SetPositionAndRotation(new Vector3((cellSize * pos.x), 1.0f, (cellSize * pos.y)), Quaternion.Euler(new Vector3(0, 0, 0)));
+        enemy.transform.SetPositionAndRotation(tempEnemyPosition, Quaternion.Euler(new Vector3(0, 0, 0)));
+        
+
         enemy.GetComponent<Renderer>().material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f));
         enemy.AddComponent<NavMeshAgent>();
         enemy.AddComponent<EnemyUI>();
@@ -933,15 +964,17 @@ public class MazeGen : MonoBehaviour
         enemy.transform.parent = GameObject.FindGameObjectWithTag("Entities").transform;
 
         enemy.AddComponent<Light>();
-        enemy.GetComponent<Light>().transform.SetPositionAndRotation(new Vector3(0, 0.5f, 0), Quaternion.Euler(new Vector3(0, 0, 0)));
         enemy.GetComponent<Light>().type = LightType.Spot;
         enemy.GetComponent<Light>().shadows = LightShadows.Soft;
         enemy.GetComponent<Light>().spotAngle = 75.0f;
         enemy.GetComponent<Light>().intensity = 5.0f;
         enemy.GetComponent<Light>().range = 20.0f;
+
+
         enemy.layer = 8;
 
         newTarget(enemy);
+
     }
 
     public void newTarget(GameObject enemy)

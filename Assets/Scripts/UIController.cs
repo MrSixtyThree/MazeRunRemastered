@@ -48,6 +48,8 @@ public class UIController : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log(Application.persistentDataPath);
+
         SaveController.GetComponent<SaveAndLoad>().setSaveLocation();
         SaveController.GetComponent<SaveAndLoad>().loadMasterList();
         playerListButtons = new List<GameObject>();
@@ -290,6 +292,38 @@ public class UIController : MonoBehaviour
         difficulty = "IMPOSSIBLE";
     }
 
+    public void setWeaponPistol()
+    {
+        generator.setWeaponPistol();
+    }
+
+    public void setWeaponMachineGun()
+    {
+        if (activePlayer.isMGUnlocked())
+        {
+            generator.setWeaponMachineGun();
+        }
+        else
+        {
+            string output = "Machine Gun is not unlocked!";
+            popup(output);
+        }
+    }
+
+    public void setWeaponShotgun()
+    {
+        if (activePlayer.isShotgunUnlocked())
+        {
+            generator.setWeaponShotgun();
+        }
+        else
+        {
+            string output = "Shotgun is not unlocked!";
+            popup(output);
+        }
+    }
+
+
     public void StartGame()
     {
         artifactValue = Random.Range(artifactValueMin, artifactValueMax);
@@ -342,6 +376,10 @@ public class UIController : MonoBehaviour
         shop_tab4.gameObject.SetActive(false);
         GameOverDeathPanel.SetActive(false);
         GameOverEscapedPanel.SetActive(true);
+
+        // Hide Maze
+        generator.hideMaze();
+
     }
 
     public void EndGameDeath()
@@ -361,13 +399,15 @@ public class UIController : MonoBehaviour
         shop_tab4.gameObject.SetActive(false);
         GameOverEscapedPanel.SetActive(false);
         GameOverDeathPanel.SetActive(true);
+
+        // Hide Maze
+        generator.hideMaze();
     }
 
     public void EscapeSaveReplay()
     {
         activePlayer.setPoints(activePlayer.getPoints() + artifactValue);
         SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
-        Debug.LogError(activePlayer.getPoints());
         GameOverEscapedPanel.SetActive(false);
         difficultyPanel.gameObject.SetActive(true);
     }
@@ -475,6 +515,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradeEvolveRate()
     {
@@ -491,6 +533,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradeMaxHealth()
     {
@@ -507,6 +551,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradePistolDamage()
     {
@@ -523,6 +569,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradePistolAccuracy()
     {
@@ -539,6 +587,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradePistolFireRate()
@@ -556,6 +606,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradePistolMagazineSize()
@@ -573,6 +625,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradePistolReload()
@@ -590,6 +644,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradeMGDamage()
     {
@@ -606,6 +662,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradeMGAccuracy()
     {
@@ -622,6 +680,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeMGFireRate()
@@ -639,6 +699,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeMGMagazineSize()
@@ -656,6 +718,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeMGReload()
@@ -673,6 +737,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeShotgunDamage()
@@ -690,6 +756,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
     public void upgradeShotgunAccuracy()
     {
@@ -706,6 +774,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeShotgunFireRate()
@@ -723,6 +793,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeShotgunMagazineSize()
@@ -740,6 +812,8 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 
     public void upgradeShotgunReload()
@@ -757,5 +831,7 @@ public class UIController : MonoBehaviour
             string output = pointValue + " points needed!";
             popup(output);
         }
+
+        setPointsDisplay();
     }
 }

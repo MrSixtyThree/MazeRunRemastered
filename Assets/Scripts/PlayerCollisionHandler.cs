@@ -9,7 +9,6 @@ public class PlayerCollisionHandler : MonoBehaviour
     public int lives = 1;
     public float invincibilityDuration = 5f;
     private bool invincible = true;
-    private float invincibleTimer = 0f;
     [SerializeField] GameObject ui;
     public TextMeshProUGUI HUDArtifact;
     public TextMeshProUGUI HUDLives;

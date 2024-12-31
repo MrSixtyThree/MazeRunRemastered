@@ -12,8 +12,14 @@ public class SaveAndLoad : MonoBehaviour
 
     public void setSaveLocation()
     {
-        SaveLocation = Application.dataPath;
+        SaveLocation = Application.persistentDataPath;
         SaveLocation += "/SaveFiles";
+
+        // Ensure the directory exists
+        if (!Directory.Exists(SaveLocation))
+        {
+            Directory.CreateDirectory(SaveLocation);
+        }
     }
 
     public void saveMasterList()
@@ -49,9 +55,10 @@ public class SaveAndLoad : MonoBehaviour
 
     public UserData Load(string name)
     {
-        if (masterList.contains(name) && File.Exists(SaveLocation + "/" + name + ".json"))
+        string filePath = SaveLocation + "/" + name + ".json";
+        if (masterList.contains(name) && File.Exists(filePath))
         {
-            string userText = File.ReadAllText(SaveLocation + "/" + name + ".json");
+            string userText = File.ReadAllText(filePath);
             return JsonUtility.FromJson<UserData>(userText);
         }
         else
