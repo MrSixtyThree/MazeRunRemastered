@@ -208,18 +208,18 @@ public class Weapon : MonoBehaviour
                 reloadTime = 3;
                 isAutomatic = true;
                 currentWeapon = Instantiate(machineGunPrefab, weaponAttachmentPoint);
-                currentWeapon.transform.localPosition = new Vector3 (-0.1f, -0.3f, 0.4f);
+                currentWeapon.transform.localPosition = new Vector3 (-0.1f, -0.4f, 0.4f);
                 currentWeapon.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-                gunReloadRotation = Quaternion.Euler(-20f, 0f, 0f);
+                gunReloadRotation = Quaternion.Euler(-35f, 0f, 0f);
                 break;
             case WeaponType.Shotgun:
                 weaponName = "Shotgun";
                 damage = 70;
-                fireRate = 0f;
+                fireRate = 0.0f;
                 bulletSpread = 0.3f;
                 bulletRange = 50;
-                bulletsPerShot = 10;
                 magazineSize = 10;
+                bulletsPerShot = magazineSize / 2;
                 reloadTime = 4;
                 isAutomatic = false;
                 currentWeapon = Instantiate(shotgunPrefab, weaponAttachmentPoint);
@@ -372,7 +372,7 @@ public class Weapon : MonoBehaviour
         Quaternion targetRotation = targetRot;
 
         float elapsedTime = 0f;
-        float duration = reloadTime * 0.5f; // Duration proportional to reload time
+        float duration = reloadTime * 0.75f; // Duration proportional to reload time
 
         while (elapsedTime < duration)
         {
@@ -410,19 +410,21 @@ public class Weapon : MonoBehaviour
                 break;
 
             case WeaponType.MachineGun:
-                damage = damage + damage * activePlayer.getMGDamage();
-                fireRate = fireRate + fireRate * activePlayer.getMGFireRate();
-                bulletSpread = bulletSpread - bulletSpread * activePlayer.getMGAccuracy();
-                magazineSize = magazineSize + (int)(magazineSize * activePlayer.getMGMag());
-                reloadTime = reloadTime - reloadTime * activePlayer.getMGReload();
+                damage *= activePlayer.getMGDamage();
+                fireRate /= activePlayer.getMGFireRate();
+                bulletSpread /= activePlayer.getMGAccuracy();
+                magazineSize = (int)(magazineSize * activePlayer.getMGMag());
+                reloadTime /= activePlayer.getMGReload();
                 break;
 
             case WeaponType.Shotgun:
-                damage = damage + damage * activePlayer.getShotgunDamage();
-                fireRate = fireRate + fireRate * activePlayer.getShotgunFireRate();
-                bulletSpread = bulletSpread - bulletSpread * activePlayer.getShotgunAccuracy();
-                magazineSize = magazineSize + (int)(magazineSize * activePlayer.getShotgunMag());
-                reloadTime = reloadTime - reloadTime * activePlayer.getShotgunReload();
+                damage *= activePlayer.getShotgunDamage();
+                fireRate /= activePlayer.getShotgunFireRate();
+                bulletSpread /= activePlayer.getShotgunAccuracy();
+                magazineSize = (int)(magazineSize * activePlayer.getShotgunMag());
+                reloadTime /= activePlayer.getShotgunReload();
+
+                bulletsPerShot = magazineSize / 2;
                 break;
         }
     }

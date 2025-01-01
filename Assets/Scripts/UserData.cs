@@ -217,7 +217,6 @@ public class UserData
     }
     public void setPistolDamage(float f)
     {
-        Debug.Log("Setting Pistol Damage to: " + f);
         this.PistolDamage = f;
     }
     public void setPistolFireRate(float f)

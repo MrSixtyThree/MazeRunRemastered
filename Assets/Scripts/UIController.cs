@@ -75,6 +75,24 @@ public class UIController : MonoBehaviour
     public float baseCostMagazineSize = 30;
     public float baseCostReload = 30;
 
+    // Limit Counters for Upgrades
+    private int upgradeLimit = 2;
+    private int movementSpeedCount = 0;
+    private int totalHealthCount = 0;
+    private int pistolDamageCount = 0;
+    private int pistolAccuracyCount = 0;
+    private int pistolFireRateCount = 0;
+    private int pistolMagazineSizeCount = 0;
+    private int pistolReloadCount = 0;
+    private int mgDamageCount = 0;
+    private int mgAccuracyCount = 0;
+    private int mgFireRateCount = 0;
+    private int mgMagazineSizeCount = 0;
+    private int mgReloadCount = 0;
+    private int shotgunDamageCount = 0;
+    private int shotgunAccuracyCount = 0;
+    private int shotgunMagazineSizeCount = 0;
+    private int shotgunReloadCount = 0;
 
     private void Start()
     {
@@ -215,6 +233,9 @@ public class UIController : MonoBehaviour
     {
         shop.gameObject.SetActive(false);
         difficultyPanel.gameObject.SetActive(true);
+
+        // Save player data
+        SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
         
     }
 
@@ -534,6 +555,12 @@ public class UIController : MonoBehaviour
     }
     public void upgradeMovementSpeed()
     {
+        if (movementSpeedCount > upgradeLimit) // Limit to 3 upgrades
+        {
+            popup("Upgrade already maxed out!");
+            return;
+        }
+
         int pointValue = findUpgradeCost("upgradeMovementSpeed");
 
         if (activePlayer.getPoints() >= pointValue)
@@ -542,6 +569,9 @@ public class UIController : MonoBehaviour
             activePlayer.setMovementSpeed(activePlayer.getMovementSpeed() + 0.1f);
 
             popup("Movement Speed Upgraded!!");
+
+            movementSpeedCount++;
+
         }
         else
         {
@@ -565,6 +595,8 @@ public class UIController : MonoBehaviour
             activePlayer.setMaxHealth(activePlayer.getMaxHealth() + 1);
 
             popup("Max Health Upgraded!!");
+
+            totalHealthCount++;
         }
         else
         {
@@ -585,6 +617,8 @@ public class UIController : MonoBehaviour
             activePlayer.setPistolDamage(activePlayer.getPistolDamage() + 0.5f);
 
             popup("Pistol Damage Upgraded");
+
+            pistolDamageCount++;
         }
         else
         {
@@ -603,6 +637,8 @@ public class UIController : MonoBehaviour
             activePlayer.setPistolAccuracy(activePlayer.getPistolAccuracy() + 0.5f);
 
             popup("Pistol Accuracy Upgraded");
+
+            pistolAccuracyCount++;
         }
         else
         {
@@ -622,6 +658,8 @@ public class UIController : MonoBehaviour
             activePlayer.setPistolFireRate(activePlayer.getPistolFireRate() + 0.4f);
 
             popup("Pistol Fire Rate Upgraded");
+
+            pistolFireRateCount++;
         }
         else
         {
@@ -641,6 +679,8 @@ public class UIController : MonoBehaviour
             activePlayer.setPistolMag(activePlayer.getPistolMag() + 0.2f);
 
             popup("Pistol Magazine Upgraded");
+
+            pistolMagazineSizeCount++;
         }
         else
         {
@@ -660,6 +700,8 @@ public class UIController : MonoBehaviour
             activePlayer.setPistolReload(activePlayer.getPistolReload() + 0.4f);
 
             popup("Pistol Reload Upgraded");
+
+            pistolReloadCount++;
         }
         else
         {
@@ -679,6 +721,8 @@ public class UIController : MonoBehaviour
             activePlayer.setMGDamage(activePlayer.getMGDamage() + 0.5f);
 
             popup("MG Damage Upgraded");
+
+            mgDamageCount++;
         }
         else
         {
@@ -697,6 +741,8 @@ public class UIController : MonoBehaviour
             activePlayer.setMGAccuracy(activePlayer.getMGAccuracy() + 0.3f);
 
             popup("MG Accuracy Upgraded");
+
+            mgAccuracyCount++;
         }
         else
         {
@@ -713,9 +759,11 @@ public class UIController : MonoBehaviour
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setMGFireRate(activePlayer.getMGFireRate() + 0.4f);
+            activePlayer.setMGFireRate(activePlayer.getMGFireRate() + 0.3f);
 
             popup("MG Fire Rate Upgraded");
+
+            mgFireRateCount++;
         }
         else
         {
@@ -735,6 +783,8 @@ public class UIController : MonoBehaviour
             activePlayer.setMGMag(activePlayer.getMGMag() + 0.2f);
 
             popup("MG Magazine Upgraded");
+
+            mgMagazineSizeCount++;
         }
         else
         {
@@ -751,9 +801,11 @@ public class UIController : MonoBehaviour
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setMGReload(activePlayer.getMGReload() + 0.3f);
+            activePlayer.setMGReload(activePlayer.getMGReload() + 0.1f);
 
             popup("MG Reload Upgraded");
+
+            mgReloadCount++;
         }
         else
         {
@@ -770,9 +822,11 @@ public class UIController : MonoBehaviour
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setShotgunDamage(activePlayer.getShotgunDamage() + 0.1f);
+            activePlayer.setShotgunDamage(activePlayer.getShotgunDamage() + 0.2f);
 
             popup("Shotgun Damage Upgraded");
+
+            shotgunDamageCount++;
         }
         else
         {
@@ -791,6 +845,8 @@ public class UIController : MonoBehaviour
             activePlayer.setShotgunAccuracy(activePlayer.getShotgunAccuracy() + 0.2f);
 
             popup("Shotgun Accuracy Upgraded");
+
+            shotgunAccuracyCount++;
         }
         else
         {
@@ -801,15 +857,18 @@ public class UIController : MonoBehaviour
         updateAllPointsText();
     }
 
+    // Redundant as fire rate for shotgun cannot be upgraded (always 0)
     public void upgradeShotgunFireRate()
     {
         int pointValue = findUpgradeCost("upgradeShotgunFireRate");
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setShotgunFireRate(activePlayer.getShotgunFireRate() + 0.2f);
+            activePlayer.setShotgunFireRate(activePlayer.getShotgunFireRate() + 0.0f);
 
             popup("Shotgun Fire Rate Upgraded");
+
+            shotgunDamageCount++;
         }
         else
         {
@@ -829,6 +888,8 @@ public class UIController : MonoBehaviour
             activePlayer.setShotgunMag(activePlayer.getShotgunMag() + 0.2f);
 
             popup("Shotgun Magazine Upgraded");
+
+            shotgunMagazineSizeCount++;
         }
         else
         {
@@ -845,9 +906,11 @@ public class UIController : MonoBehaviour
         if (activePlayer.getPoints() >= pointValue)
         {
             activePlayer.setPoints(activePlayer.getPoints() - pointValue);
-            activePlayer.setShotgunReload(activePlayer.getShotgunReload() + 0.2f);
+            activePlayer.setShotgunReload(activePlayer.getShotgunReload() + 0.4f);
 
             popup("Shotgun Reload Upgraded");
+
+            shotgunReloadCount++;
         }
         else
         {
@@ -865,58 +928,168 @@ public class UIController : MonoBehaviour
         {
             // Player Upgrades
             case "upgradeMovementSpeed":
-                return (int)(baseCostMovementSpeed * Mathf.Pow(activePlayer.getMovementSpeed(), growthRate));
+                if (movementSpeedCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostMovementSpeed * Mathf.Pow(activePlayer.getMovementSpeed(), growthRate));
+                }
+                
 
             case "upgradeMaxHealth":
-                return (int)(activePlayer.getMaxHealth() * 40);
-            
+                if (totalHealthCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(activePlayer.getMaxHealth() * 40);
+                }
+
             // Pistol Upgrades
             case "upgradePistolDamage":
-                return (int)(baseCostDamage * Mathf.Pow(activePlayer.getPistolDamage(), growthRate));
+                if (pistolDamageCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostDamage * Mathf.Pow(activePlayer.getPistolDamage(), growthRate));
+                }
             
             case "upgradePistolAccuracy":
-                return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getPistolAccuracy(), growthRate));
+                if (pistolAccuracyCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getPistolAccuracy(), growthRate));
+                }
             
             case "upgradePistolFireRate":
-                return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getPistolFireRate(), growthRate));
+                if (pistolFireRateCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getPistolFireRate(), growthRate));
+                }
 
             case "upgradePistolMagazineSize":
-                return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getPistolMag(), growthRate));
+                if (pistolMagazineSizeCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getPistolMag(), growthRate));
+                }
 
             case "upgradePistolReload":
-                return (int)(baseCostReload * Mathf.Pow(activePlayer.getPistolReload(), growthRate));
+                if (pistolReloadCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostReload * Mathf.Pow(activePlayer.getPistolReload(), growthRate));
+                }
 
             // Machine Gun Upgrades
             case "upgradeMGDamage":
-                return (int)(baseCostDamage * Mathf.Pow(activePlayer.getMGDamage(), growthRate));
+                if (mgDamageCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostDamage * Mathf.Pow(activePlayer.getMGDamage(), growthRate));
+                }            
 
             case "upgradeMGAccuracy":
-                return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getMGAccuracy(), growthRate));
+                if (mgAccuracyCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getMGAccuracy(), growthRate));
+                }
 
             case "upgradeMGFireRate":
-                return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getMGFireRate(), growthRate));
+                if (mgFireRateCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getMGFireRate(), growthRate));
+                }
             
             case "upgradeMGMagazineSize":
-                return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getMGMag(), growthRate));
+                if (mgMagazineSizeCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getMGMag(), growthRate));
+                }
 
             case "upgradeMGReload":
-                return (int)(baseCostReload * Mathf.Pow(activePlayer.getMGReload(), growthRate));
+                if (mgReloadCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostReload * Mathf.Pow(activePlayer.getMGReload(), growthRate));
+                }
 
             // Shotgun Upgrades
             case "upgradeShotgunDamage":
-                return (int)(baseCostDamage * Mathf.Pow(activePlayer.getShotgunDamage(), growthRate));
+                if (shotgunDamageCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostDamage * Mathf.Pow(activePlayer.getShotgunDamage(), growthRate));
+                }
             
             case "upgradeShotgunAccuracy":
-                return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getShotgunAccuracy(), growthRate));
-            
-            case "upgradeShotgunFireRate":
-                return (int)(baseCostFireRate * Mathf.Pow(activePlayer.getShotgunFireRate(), growthRate));
+                if (shotgunAccuracyCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostAccuracy * Mathf.Pow(activePlayer.getShotgunAccuracy(), growthRate));
+                }
             
             case "upgradeShotgunMagazineSize":
-                return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getShotgunMag(), growthRate));
+                if (shotgunMagazineSizeCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostMagazineSize * Mathf.Pow(activePlayer.getShotgunMag(), growthRate));
+                }
 
             case "upgradeShotgunReload":
-                return (int)(baseCostReload * Mathf.Pow(activePlayer.getShotgunReload(), growthRate));
+                if (shotgunReloadCount > upgradeLimit)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (int)(baseCostReload * Mathf.Pow(activePlayer.getShotgunReload(), growthRate));
+                }
 
             // Default case for incorrect string
             default:
@@ -928,22 +1101,23 @@ public class UIController : MonoBehaviour
     public void updateAllPointsText()
     {
         setPointsDisplay();
-        upgradeMovementSpeedCostText.text = findUpgradeCost("upgradeMovementSpeed").ToString();
-        upgradeTotalHealthCostText.text = findUpgradeCost("upgradeMaxHealth").ToString();
-        upgradePistolDamageCostText.text = findUpgradeCost("upgradePistolDamage").ToString();
-        upgradePistolAccuracyCostText.text = findUpgradeCost("upgradePistolAccuracy").ToString();
-        upgradePistolFireRateCostText.text = findUpgradeCost("upgradePistolFireRate").ToString();
-        upgradePistolMagazineSizeCostText.text = findUpgradeCost("upgradePistolMagazineSize").ToString();
-        upgradePistolReloadCostText.text = findUpgradeCost("upgradePistolReload").ToString();
-        // upgradeMGDamageCostText.text = findUpgradeCost("upgradeMGDamage").ToString();
-        // upgradeMGAccuracyCostText.text = findUpgradeCost("upgradeMGAccuracy").ToString();
-        // upgradeMGFireRateCostText.text = findUpgradeCost("upgradeMGFireRate").ToString();
-        // upgradeMGMagazineSizeCostText.text = findUpgradeCost("upgradeMGMagazineSize").ToString();
-        // upgradeMGReloadCostText.text = findUpgradeCost("upgradeMGReload").ToString();
-        // upgradeShotgunDamageCostText.text = findUpgradeCost("upgradeShotgunDamage").ToString();
-        // upgradeShotgunAccuracyCostText.text = findUpgradeCost("upgradeShotgunAccuracy").ToString();
-        // upgradeShotgunFireRateCostText.text = findUpgradeCost("upgradeShotgunFireRate").ToString();
-        // upgradeShotgunMagazineSizeCostText.text = findUpgradeCost("upgradeShotgunMagazineSize").ToString();
-        // upgradeShotgunReloadCostText.text = findUpgradeCost("upgradeShotgunReload").ToString();
+        // If upgrade cost is 0, display "Maxed Out"
+        upgradeMovementSpeedCostText.text = findUpgradeCost("upgradeMovementSpeed") == 0 ? "N/A" : findUpgradeCost("upgradeMovementSpeed").ToString();
+        upgradeTotalHealthCostText.text = findUpgradeCost("upgradeMaxHealth") == 0 ? "N/A" : findUpgradeCost("upgradeMaxHealth").ToString();
+        upgradePistolDamageCostText.text = findUpgradeCost("upgradePistolDamage") == 0 ? "N/A" : findUpgradeCost("upgradePistolDamage").ToString();
+        upgradePistolAccuracyCostText.text = findUpgradeCost("upgradePistolAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradePistolAccuracy").ToString();
+        upgradePistolFireRateCostText.text = findUpgradeCost("upgradePistolFireRate") == 0 ? "N/A" : findUpgradeCost("upgradePistolFireRate").ToString();
+        upgradePistolMagazineSizeCostText.text = findUpgradeCost("upgradePistolMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradePistolMagazineSize").ToString();
+        upgradePistolReloadCostText.text = findUpgradeCost("upgradePistolReload") == 0 ? "N/A" : findUpgradeCost("upgradePistolReload").ToString();
+        // upgradeMGDamageCostText.text = findUpgradeCost("upgradeMGDamage") == 0 ? "N/A" : findUpgradeCost("upgradeMGDamage").ToString();
+        // upgradeMGAccuracyCostText.text = findUpgradeCost("upgradeMGAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradeMGAccuracy").ToString();
+        // upgradeMGFireRateCostText.text = findUpgradeCost("upgradeMGFireRate") == 0 ? "N/A" : findUpgradeCost("upgradeMGFireRate").ToString();
+        // upgradeMGMagazineSizeCostText.text = findUpgradeCost("upgradeMGMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradeMGMagazineSize").ToString();
+        // upgradeMGReloadCostText.text = findUpgradeCost("upgradeMGReload") == 0 ? "N/A" : findUpgradeCost("upgradeMGReload").ToString();
+        // upgradeShotgunDamageCostText.text = findUpgradeCost("upgradeShotgunDamage") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunDamage").ToString();
+        // upgradeShotgunAccuracyCostText.text = findUpgradeCost("upgradeShotgunAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunAccuracy").ToString();
+        // upgradeShotgunMagazineSizeCostText.text = findUpgradeCost("upgradeShotgunMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunMagazineSize").ToString();
+        // upgradeShotgunReloadCostText.text = findUpgradeCost("upgradeShotgunReload") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunReload").ToString();
+        
     }
 }
