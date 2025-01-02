@@ -47,7 +47,6 @@ public class UIController : MonoBehaviour
     [SerializeField] TextMeshProUGUI upgradeMGMagazineSizeCostText;
     [SerializeField] TextMeshProUGUI upgradeMGReloadCostText;
     [SerializeField] TextMeshProUGUI upgradeShotgunDamageCostText;
-    [SerializeField] TextMeshProUGUI upgradeShotgunFireRateCostText;
     [SerializeField] TextMeshProUGUI upgradeShotgunAccuracyCostText;
     [SerializeField] TextMeshProUGUI upgradeShotgunMagazineSizeCostText;
     [SerializeField] TextMeshProUGUI upgradeShotgunReloadCostText;
@@ -1109,15 +1108,15 @@ public class UIController : MonoBehaviour
         upgradePistolFireRateCostText.text = findUpgradeCost("upgradePistolFireRate") == 0 ? "N/A" : findUpgradeCost("upgradePistolFireRate").ToString();
         upgradePistolMagazineSizeCostText.text = findUpgradeCost("upgradePistolMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradePistolMagazineSize").ToString();
         upgradePistolReloadCostText.text = findUpgradeCost("upgradePistolReload") == 0 ? "N/A" : findUpgradeCost("upgradePistolReload").ToString();
-        // upgradeMGDamageCostText.text = findUpgradeCost("upgradeMGDamage") == 0 ? "N/A" : findUpgradeCost("upgradeMGDamage").ToString();
-        // upgradeMGAccuracyCostText.text = findUpgradeCost("upgradeMGAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradeMGAccuracy").ToString();
-        // upgradeMGFireRateCostText.text = findUpgradeCost("upgradeMGFireRate") == 0 ? "N/A" : findUpgradeCost("upgradeMGFireRate").ToString();
-        // upgradeMGMagazineSizeCostText.text = findUpgradeCost("upgradeMGMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradeMGMagazineSize").ToString();
-        // upgradeMGReloadCostText.text = findUpgradeCost("upgradeMGReload") == 0 ? "N/A" : findUpgradeCost("upgradeMGReload").ToString();
-        // upgradeShotgunDamageCostText.text = findUpgradeCost("upgradeShotgunDamage") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunDamage").ToString();
-        // upgradeShotgunAccuracyCostText.text = findUpgradeCost("upgradeShotgunAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunAccuracy").ToString();
-        // upgradeShotgunMagazineSizeCostText.text = findUpgradeCost("upgradeShotgunMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunMagazineSize").ToString();
-        // upgradeShotgunReloadCostText.text = findUpgradeCost("upgradeShotgunReload") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunReload").ToString();
+        upgradeMGDamageCostText.text = findUpgradeCost("upgradeMGDamage") == 0 ? "N/A" : findUpgradeCost("upgradeMGDamage").ToString();
+        upgradeMGAccuracyCostText.text = findUpgradeCost("upgradeMGAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradeMGAccuracy").ToString();
+        upgradeMGFireRateCostText.text = findUpgradeCost("upgradeMGFireRate") == 0 ? "N/A" : findUpgradeCost("upgradeMGFireRate").ToString();
+        upgradeMGMagazineSizeCostText.text = findUpgradeCost("upgradeMGMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradeMGMagazineSize").ToString();
+        upgradeMGReloadCostText.text = findUpgradeCost("upgradeMGReload") == 0 ? "N/A" : findUpgradeCost("upgradeMGReload").ToString();
+        upgradeShotgunDamageCostText.text = findUpgradeCost("upgradeShotgunDamage") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunDamage").ToString();
+        upgradeShotgunAccuracyCostText.text = findUpgradeCost("upgradeShotgunAccuracy") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunAccuracy").ToString();
+        upgradeShotgunMagazineSizeCostText.text = findUpgradeCost("upgradeShotgunMagazineSize") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunMagazineSize").ToString();
+        upgradeShotgunReloadCostText.text = findUpgradeCost("upgradeShotgunReload") == 0 ? "N/A" : findUpgradeCost("upgradeShotgunReload").ToString();
         
     }
 }
