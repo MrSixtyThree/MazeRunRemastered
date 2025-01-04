@@ -8045,6 +8045,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194229}
   - component: {fileID: 963194230}
+  - component: {fileID: 963194231}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -8154,6 +8155,14 @@ MonoBehaviour:
   NorthLayer: {fileID: 1161701674}
   ArtifactLayer: {fileID: 558677078}
   artifactPlace: {fileID: 0}
+--- !u!81 &963194231
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
 --- !u!1 &983260593
 GameObject:
   m_ObjectHideFlags: 0
@@ -14520,6 +14529,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1851545984}
   m_CullTransparentMesh: 1
+--- !u!1 &1865517206
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1865517208}
+  - component: {fileID: 1865517207}
+  m_Layer: 0
+  m_Name: Audio Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1865517207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865517206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f03bfa588232b0a4db4b480877f185c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volume: 1
+  UIAudioMixerGroup: {fileID: 6118430912587178153, guid: 198a51d7b9be10145adc3a9d5f61d77b, type: 2}
+  GameMusicMixer: {fileID: -1113757836167491245, guid: 198a51d7b9be10145adc3a9d5f61d77b, type: 2}
+  gameMusic: {fileID: 8300000, guid: 519d59b3f11cae44ca5f20482c7de205, type: 3}
+  menuMusic: {fileID: 8300000, guid: bbd89b9781267764698350a889876656, type: 3}
+  pistolFire: {fileID: 8300000, guid: 1260c01037aa5e34a99749851335abb0, type: 3}
+  pistolReload: {fileID: 8300000, guid: 5ea5c20f9f2c0a545819567063936e1b, type: 3}
+  machineGunFire: {fileID: 8300000, guid: 57a09a0e71515954fa88b27ad687b870, type: 3}
+  machineGunReload: {fileID: 8300000, guid: b59a481285567064c8f80712149cfb83, type: 3}
+  shotgunFire: {fileID: 8300000, guid: 73a3edd370d3f3d4a8c00b5c8287f849, type: 3}
+  shotgunReload: {fileID: 8300000, guid: 2b96a599bf5016a42a40b235412d2347, type: 3}
+  buttonClick: {fileID: 8300000, guid: a60c4753f42bb6b4d9b6d7801ad9e0f1, type: 3}
+  shopPurchase: {fileID: 8300000, guid: 6beda5dc46713894d933bd802f32b215, type: 3}
+  alertedEnemiesCount: 0
+--- !u!4 &1865517208
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865517206}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -162.92143, y: 172.83228, z: 34.431057}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1928492801
 GameObject:
   m_ObjectHideFlags: 0
@@ -15501,6 +15568,7 @@ MonoBehaviour:
   mainMenu: {fileID: 1490832191}
   Man: {fileID: 397978813}
   SaveController: {fileID: 1771791128}
+  AudioManager: {fileID: 1865517206}
   autumn: {fileID: 11400000, guid: 68fa62c5378c0b342bd81ce429ca9bb5, type: 2}
   HUD: {fileID: 614995922}
   shop: {fileID: 1208178641}
@@ -15524,7 +15592,6 @@ MonoBehaviour:
   upgradeMGMagazineSizeCostText: {fileID: 1494741338}
   upgradeMGReloadCostText: {fileID: 1928492802}
   upgradeShotgunDamageCostText: {fileID: 1929442658}
-  upgradeShotgunFireRateCostText: {fileID: 0}
   upgradeShotgunAccuracyCostText: {fileID: 1336990791}
   upgradeShotgunMagazineSizeCostText: {fileID: 2102159859}
   upgradeShotgunReloadCostText: {fileID: 873787395}
@@ -16541,3 +16608,4 @@ SceneRoots:
   - {fileID: 527333434}
   - {fileID: 1771791130}
   - {fileID: 777893158}
+  - {fileID: 1865517208}

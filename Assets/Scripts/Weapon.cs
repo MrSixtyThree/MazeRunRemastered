@@ -14,6 +14,9 @@ public class Weapon : MonoBehaviour
 
     public WeaponType weapon;
 
+    // Audio Manager
+    public AudioManager audioManager;
+
     // Gun attributes
     public string weaponName;
     public float damage;
@@ -44,6 +47,7 @@ public class Weapon : MonoBehaviour
     public Camera cam;
     private GameObject currentWeapon;
     public LayerMask canBeHitLayerMask;
+    public LayerMask enemyLayerMask;
     private RaycastHit hit;
     public GameObject bulletEffect;
     public GameObject pistolPrefab;
@@ -53,6 +57,9 @@ public class Weapon : MonoBehaviour
     public TextMeshProUGUI HUDAmmo;
 
     public UserData activePlayer;
+
+    public float impactSoundRadius = 5f;
+    public float firingSoundRadius = 10f;
 
     // Methods
 
@@ -66,6 +73,11 @@ public class Weapon : MonoBehaviour
         Cursor.visible = false;
         currentMagazineAmmo = magazineSize;
         canShoot = true;
+
+        audioManager = GameObject.Find("Audio Controller").GetComponent<AudioManager>();
+
+        enemyLayerMask = LayerMask.GetMask("Enemies");
+        canBeHitLayerMask = ~LayerMask.GetMask("Ignore Raycast");
 
     }
 
@@ -237,8 +249,6 @@ public class Weapon : MonoBehaviour
 
     protected void RayCastShoot()
     {
-        // Debug Line for Upgrade Application
-        Debug.Log("Damage: " + damage + " Fire Rate: " + fireRate + " Bullet Spread: " + bulletSpread + " Magazine Size: " + magazineSize + " Reload Time: " + reloadTime);
 
         canShoot = false;
 
@@ -266,6 +276,14 @@ public class Weapon : MonoBehaviour
                 hit.collider.GetComponent<EnemyUI>().takeDamage((int)damage); // Implement enemies taking damage
                 timeSinceHit = Time.time;
             }
+            else
+            {
+                // Get enemies to investigate the bullet impact
+                foreach (Collider enemy in Physics.OverlapSphere(hit.point, impactSoundRadius, enemyLayerMask))
+                {
+                    enemy.GetComponent<EnemyUI>().setCustomGoal(hit.point);
+                }
+            }
         }
 
         // Instantiate special effect for bullet hit
@@ -275,12 +293,35 @@ public class Weapon : MonoBehaviour
         bulletsShot--; // Count down the number of times the gun has shot per shot
 
         Invoke("ResetShootTime", fireRate); // Allow shooting again after delay of firerate
+
+        // Play sound effect
+        switch (weapon)
+        {
+            case WeaponType.Pistol:
+                audioManager.PlaySFX("pistolFire", transform.position, 0.3f);
+                break;
+            case WeaponType.MachineGun:
+                audioManager.PlaySFX("machineGunFire", transform.position);
+                break;
+            case WeaponType.Shotgun:
+                if (bulletsShot == 0)
+                {
+                    audioManager.PlaySFX("shotgunFire", transform.position);
+                }
+                break;
+        }
           
         if (bulletsShot > 0 && currentMagazineAmmo > 0)
         {
             Invoke("RayCastShoot", fireRate);
         }
-        
+
+        // Get enemies to investigate the sound of the gun firing, takes precedence over bullet impact
+        foreach (Collider enemy in Physics.OverlapSphere(transform.position, firingSoundRadius, enemyLayerMask))
+        {
+            enemy.GetComponent<EnemyUI>().setCustomGoal(transform.position);
+        }
+
     }
 
     public void Reload()
@@ -290,7 +331,9 @@ public class Weapon : MonoBehaviour
 
         StopAllCoroutines();
 
-        StartCoroutine(ReloadRoutine());        
+        StartCoroutine(ReloadRoutine());
+
+
     }
 
     private IEnumerator ReloadRoutine()
@@ -300,6 +343,20 @@ public class Weapon : MonoBehaviour
             StartCoroutine(rotateWeapon(gunReloadRotation)),
             //StartCoroutine(moveWeapon(gunReloadPosition))
         };
+
+        // Play sound effect
+        switch (weapon)
+        {
+            case WeaponType.Pistol:
+                audioManager.Play2DSFX("pistolReload");
+                break;
+            case WeaponType.MachineGun:
+                audioManager.Play2DSFX("machineGunReload");
+                break;
+            case WeaponType.Shotgun:
+                audioManager.Play2DSFX("shotgunReload");
+                break;
+        }
         
         foreach (var routine in routines)
         {

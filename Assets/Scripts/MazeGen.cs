@@ -994,12 +994,35 @@ public class MazeGen : MonoBehaviour
         target.GetComponent<Rigidbody>().isKinematic = true;
         target.GetComponent<Rigidbody>().useGravity = false;
         target.GetComponent<MeshFilter>().sharedMesh = null;
+        target.layer = 2;
 
 
         enemy.GetComponent<EnemyUI>().setGoal(target.transform);
     }
 
-    
+    public void newTarget(GameObject enemy, Vector3 pos)
+    {
+        GameObject target = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
+        target.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        target.transform.SetPositionAndRotation(pos, Quaternion.Euler(new Vector3(0, 0, 0)));
+        target.GetComponent<Renderer>().material.SetColor("_Color", new Color(0.0f, 1.0f, 0.0f));
+        target.tag = "Goal";
+        target.transform.parent = GameObject.FindGameObjectWithTag("Entities").transform;
+        target.GetComponent<SphereCollider>().isTrigger = true;
+        target.AddComponent<Rigidbody>();
+        target.GetComponent<Rigidbody>().isKinematic = true;
+        target.GetComponent<Rigidbody>().useGravity = false;
+        target.GetComponent<MeshFilter>().sharedMesh = null;
+
+        target.layer = 2;
+
+
+
+        enemy.GetComponent<EnemyUI>().setGoal(target.transform);
+    }
+
+
 }
 
 

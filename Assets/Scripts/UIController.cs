@@ -22,6 +22,7 @@ public class UIController : MonoBehaviour
     [SerializeField] Canvas mainMenu;
     [SerializeField] Image Man;
     [SerializeField] GameObject SaveController;
+    [SerializeField] GameObject AudioManager;
     [SerializeField] TMPro.TMP_FontAsset autumn;
     [SerializeField] GameObject HUD;
     [SerializeField] GameObject shop;
@@ -118,20 +119,12 @@ public class UIController : MonoBehaviour
         GameOverDeathPanel.SetActive(false);
         GameOverEscapedPanel.SetActive(false);
 
-        //Testing Below
-
         mainMenu.gameObject.SetActive(true);
         shop.gameObject.SetActive(false);
         HUD.gameObject.SetActive(false); // Changed to false
 
-        //TEST();
-        //setEasy();
-        //setMedium();
-        //setHard();
-        //setDeadly();
-        //setImpossible();
-
-        //StartGame();
+        // Play Menu Music
+        AudioManager.GetComponent<AudioManager>().PlayMusic("menuMusic");
     }
 
     private void Update()
@@ -147,8 +140,21 @@ public class UIController : MonoBehaviour
             }
         }
     }
+
+    public void PlayUIButtonSound()
+    {
+        AudioManager.GetComponent<AudioManager>().Play2DSFX("buttonClick", 1.0f, true);
+    }
+
+    public void PlayPurchaseSound()
+    {
+        AudioManager.GetComponent<AudioManager>().Play2DSFX("shopPurchase", 0.8f);
+    }
+
     public void ExitGameButton()
     {
+        PlayUIButtonSound();
+
         #if UNITY_EDITOR
         
         UnityEditor.EditorApplication.isPlaying = false;
@@ -161,6 +167,8 @@ public class UIController : MonoBehaviour
     {
         buttonPanel.gameObject.SetActive(false);
         saveLoadPanel.gameObject.SetActive(true);
+
+        PlayUIButtonSound();
     }
 
     public void NewGame()
@@ -169,6 +177,7 @@ public class UIController : MonoBehaviour
         Man.gameObject.SetActive(false);
         newGamePanel.gameObject.SetActive(true);
 
+        PlayUIButtonSound();
     }
 
     public void LoadGame()
@@ -203,6 +212,8 @@ public class UIController : MonoBehaviour
 
             playerListButtons.Add(playerName);
         }
+
+        PlayUIButtonSound();
     }
 
     public void GoBackButton()
@@ -210,6 +221,8 @@ public class UIController : MonoBehaviour
         loadPanel.gameObject.SetActive(false);
         saveLoadPanel.gameObject.SetActive(true);
         Man.gameObject.SetActive(true);
+
+        PlayUIButtonSound();
     }
 
     public void ShopButton()
@@ -221,6 +234,8 @@ public class UIController : MonoBehaviour
         shop_tab3.gameObject.SetActive(false);
         shop_tab4.gameObject.SetActive(false);
         updateAllPointsText();
+
+        PlayUIButtonSound();
     }
 
     public void setPointsDisplay()
@@ -235,7 +250,9 @@ public class UIController : MonoBehaviour
 
         // Save player data
         SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
-        
+
+        PlayUIButtonSound();
+
     }
 
     public void setPlayer(string name, int index)
@@ -263,6 +280,8 @@ public class UIController : MonoBehaviour
             activePlayer = SaveController.GetComponent<SaveAndLoad>().Load(activePlayerName);
             
         }
+
+        PlayUIButtonSound();
     }
 
     public void letsGoButton2()
@@ -286,6 +305,8 @@ public class UIController : MonoBehaviour
         {
             popup("User Name Cannot be " + name + ".");
         }
+
+        PlayUIButtonSound();
     }
 
     public void TEST()
@@ -306,6 +327,8 @@ public class UIController : MonoBehaviour
         artifactValueMin = 5;
         artifactValueMax = 13;
         difficulty = "EASY";
+
+        PlayUIButtonSound();
     }
     public void setMedium()
     {
@@ -315,6 +338,8 @@ public class UIController : MonoBehaviour
         artifactValueMin = 10;
         artifactValueMax = 25;
         difficulty = "MEDIUM";
+
+        PlayUIButtonSound();
     }
     public void setHard()
     {
@@ -324,6 +349,8 @@ public class UIController : MonoBehaviour
         artifactValueMin = 18;
         artifactValueMax = 35;
         difficulty = "HARD";
+
+        PlayUIButtonSound();
     }
     public void setDeadly()
     {
@@ -333,6 +360,8 @@ public class UIController : MonoBehaviour
         artifactValueMin = 25;
         artifactValueMax = 60;
         difficulty = "DEADLY";
+
+        PlayUIButtonSound();
     }
     public void setImpossible()
     {
@@ -342,11 +371,15 @@ public class UIController : MonoBehaviour
         artifactValueMin = 32;
         artifactValueMax = 100;
         difficulty = "IMPOSSIBLE";
+
+        PlayUIButtonSound();
     }
 
     public void setWeaponPistol()
     {
         generator.setWeaponPistol();
+
+        PlayUIButtonSound();
     }
 
     public void setWeaponMachineGun()
@@ -360,6 +393,8 @@ public class UIController : MonoBehaviour
             string output = "Machine Gun is not unlocked!";
             popup(output);
         }
+
+        PlayUIButtonSound();
     }
 
     public void setWeaponShotgun()
@@ -373,6 +408,8 @@ public class UIController : MonoBehaviour
             string output = "Shotgun is not unlocked!";
             popup(output);
         }
+
+        PlayUIButtonSound();
     }
 
 
@@ -400,7 +437,11 @@ public class UIController : MonoBehaviour
         mainMenu.gameObject.SetActive(false);
  
         HUD = GameObject.Find("PlayerCamera").gameObject.transform.Find("HUD").gameObject; // Gets the players HUD and not the inactive HUD. Cant remove the HUD in scene as it causes difficultypanel to display, idk why
-        HUD.gameObject.SetActive(true); 
+        HUD.gameObject.SetActive(true);
+
+        PlayUIButtonSound();
+
+        AudioManager.GetComponent<AudioManager>().PlayMusic("gameMusic");
     }
 
     void popup(string text)
@@ -432,6 +473,8 @@ public class UIController : MonoBehaviour
         // Hide Maze
         generator.hideMaze();
 
+        AudioManager.GetComponent<AudioManager>().StopMusic();
+
     }
 
     public void EndGameDeath()
@@ -454,6 +497,8 @@ public class UIController : MonoBehaviour
 
         // Hide Maze
         generator.hideMaze();
+
+        AudioManager.GetComponent<AudioManager>().StopMusic();
     }
 
     public void EscapeSaveReplay()
@@ -462,29 +507,44 @@ public class UIController : MonoBehaviour
         SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
         GameOverEscapedPanel.SetActive(false);
         difficultyPanel.gameObject.SetActive(true);
+
+        PlayUIButtonSound();
+
+        AudioManager.GetComponent<AudioManager>().PlayMusic("menuMusic");
     }
     public void EscapeSaveQuit()
     {
         activePlayer.setPoints(activePlayer.getPoints() + artifactValue);
         SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
         GameOverEscapedPanel.SetActive(false);
+
+        PlayUIButtonSound();
+
+
         #if UNITY_EDITOR
 
         UnityEditor.EditorApplication.isPlaying = false;
         #else
         Application.Quit();
         #endif
+
     }
     public void DeathSaveReplay()
     {
         GameOverDeathPanel.SetActive(false);
         SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
         difficultyPanel.gameObject.SetActive(true);
+
+        PlayUIButtonSound();
+
     }
     public void DeathSaveQuit()
     {
         SaveController.GetComponent<SaveAndLoad>().Save(activePlayer);
         GameOverDeathPanel.SetActive(false);
+
+        PlayUIButtonSound();
+
         #if UNITY_EDITOR
 
         UnityEditor.EditorApplication.isPlaying = false;
@@ -500,6 +560,9 @@ public class UIController : MonoBehaviour
         shop_tab2.gameObject.SetActive(false);
         shop_tab3.gameObject.SetActive(false);
         shop_tab4.gameObject.SetActive(false);
+
+        PlayUIButtonSound();
+
     }
     public void shopPistolUpgrades()
     {
@@ -508,6 +571,9 @@ public class UIController : MonoBehaviour
         shop_tab2.gameObject.SetActive(true);
         shop_tab3.gameObject.SetActive(false);
         shop_tab4.gameObject.SetActive(false);
+
+        PlayUIButtonSound();
+
     }
 
     public void shopMGUpgrades()
@@ -530,6 +596,9 @@ public class UIController : MonoBehaviour
             string output = 30 + " points needed!";
             popup(output);
         }
+
+        PlayUIButtonSound();
+
     }
     public void shopShotgunUpgrades()
     {
@@ -551,6 +620,9 @@ public class UIController : MonoBehaviour
             string output = 50 + " points needed!";
             popup(output);
         }
+
+        PlayUIButtonSound();
+
     }
     public void upgradeMovementSpeed()
     {
@@ -570,6 +642,8 @@ public class UIController : MonoBehaviour
             popup("Movement Speed Upgraded!!");
 
             movementSpeedCount++;
+
+            PlayPurchaseSound();
 
         }
         else
@@ -596,6 +670,8 @@ public class UIController : MonoBehaviour
             popup("Max Health Upgraded!!");
 
             totalHealthCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -618,6 +694,8 @@ public class UIController : MonoBehaviour
             popup("Pistol Damage Upgraded");
 
             pistolDamageCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -638,6 +716,8 @@ public class UIController : MonoBehaviour
             popup("Pistol Accuracy Upgraded");
 
             pistolAccuracyCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -659,6 +739,8 @@ public class UIController : MonoBehaviour
             popup("Pistol Fire Rate Upgraded");
 
             pistolFireRateCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -680,6 +762,8 @@ public class UIController : MonoBehaviour
             popup("Pistol Magazine Upgraded");
 
             pistolMagazineSizeCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -701,6 +785,8 @@ public class UIController : MonoBehaviour
             popup("Pistol Reload Upgraded");
 
             pistolReloadCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -722,6 +808,8 @@ public class UIController : MonoBehaviour
             popup("MG Damage Upgraded");
 
             mgDamageCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -742,6 +830,8 @@ public class UIController : MonoBehaviour
             popup("MG Accuracy Upgraded");
 
             mgAccuracyCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -763,6 +853,8 @@ public class UIController : MonoBehaviour
             popup("MG Fire Rate Upgraded");
 
             mgFireRateCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -784,6 +876,8 @@ public class UIController : MonoBehaviour
             popup("MG Magazine Upgraded");
 
             mgMagazineSizeCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -805,6 +899,8 @@ public class UIController : MonoBehaviour
             popup("MG Reload Upgraded");
 
             mgReloadCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -826,6 +922,8 @@ public class UIController : MonoBehaviour
             popup("Shotgun Damage Upgraded");
 
             shotgunDamageCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -846,6 +944,8 @@ public class UIController : MonoBehaviour
             popup("Shotgun Accuracy Upgraded");
 
             shotgunAccuracyCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -868,6 +968,8 @@ public class UIController : MonoBehaviour
             popup("Shotgun Fire Rate Upgraded");
 
             shotgunDamageCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -889,6 +991,8 @@ public class UIController : MonoBehaviour
             popup("Shotgun Magazine Upgraded");
 
             shotgunMagazineSizeCount++;
+
+            PlayPurchaseSound();
         }
         else
         {
@@ -910,6 +1014,8 @@ public class UIController : MonoBehaviour
             popup("Shotgun Reload Upgraded");
 
             shotgunReloadCount++;
+
+            PlayPurchaseSound();
         }
         else
         {

@@ -13,6 +13,7 @@ public class EnemyUI : MonoBehaviour
     [SerializeField] NavMeshAgent agent;
     [SerializeField] GameObject enemy;
     [SerializeField] GameObject controller;
+    [SerializeField] GameObject audioManager;
     public GameObject player;
     [SerializeField] LayerMask targetMask;
     [SerializeField] LayerMask allyMask;
@@ -29,6 +30,8 @@ public class EnemyUI : MonoBehaviour
     public bool stunned = false;
     public int damage = 0;
     public int delay = 0;
+
+    public bool isAlerted = false;
 
     public bool attackMode = false;
     public float movementSpeedAttack = 2.5f;
@@ -48,6 +51,8 @@ public class EnemyUI : MonoBehaviour
         agent.speed = movementSpeed;
         alertRadius = 1.5f + (controller.GetComponent<MazeGen>().MazeHeight / 2);
         player = GameObject.FindWithTag("Player");
+
+        audioManager = GameObject.Find("Audio Controller");
     }
 
     void Update()
@@ -78,6 +83,10 @@ public class EnemyUI : MonoBehaviour
 
         if (stunned)
         {
+            if (isAlerted)
+            {
+                unalertEnemy();
+            }
             attackMode = false;
             agent.speed = 0;
             agent.isStopped = true;
@@ -117,6 +126,7 @@ public class EnemyUI : MonoBehaviour
         {
             delay = 0;
             attackMode = false;
+            unalertEnemy();
             //Debug.LogError("Attack mode turned to false");
         }
 
@@ -145,6 +155,9 @@ public class EnemyUI : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + transform.forward * 2);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(transform.position, goal.position);
     }
 
     public void setAgent(GameObject gameObject)
@@ -156,6 +169,11 @@ public class EnemyUI : MonoBehaviour
     public void setGoal(Transform target)
     {
         goal = target;
+    }
+
+    public void setCustomGoal(Vector3 target)
+    {
+        controller.GetComponent<MazeGen>().newTarget(enemy, target);
     }
 
     public void setMasks(LayerMask target, LayerMask obstacle1, LayerMask obstacle2, LayerMask ally)
@@ -223,6 +241,25 @@ public class EnemyUI : MonoBehaviour
     {
         attackMode = true;
         cooldown = number;
+
+        // Call AudioManager to alert enemies
+        if (!isAlerted)
+        {
+            audioManager.GetComponent<AudioManager>().IsEnemyAlerted(true);
+            isAlerted = true;
+        }
+        
+
+    }
+
+    void unalertEnemy()
+    {
+        if (isAlerted)
+        {
+            isAlerted = false;
+            // Call AudioManager to unalert enemies
+            audioManager.GetComponent<AudioManager>().IsEnemyAlerted(false);
+        }
     }
 
     public void takeDamage(int damageTaken)
@@ -233,5 +270,10 @@ public class EnemyUI : MonoBehaviour
             health = health - damageTaken;
             findNearbyAllies();
         }
+    }
+
+    public void OnDestroy()
+    {
+        audioManager.GetComponent<AudioManager>().IsEnemyAlerted(false);
     }
 }
