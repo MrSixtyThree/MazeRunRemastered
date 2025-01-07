@@ -955,6 +955,7 @@ public class MazeGen : MonoBehaviour
 
         enemy.GetComponent<Renderer>().material.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f));
         enemy.AddComponent<NavMeshAgent>();
+        enemy.GetComponent<NavMeshAgent>().obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance; // Ensure they do not collide with other enemies
         enemy.AddComponent<EnemyUI>();
         enemy.GetComponent<EnemyUI>().setAgent(enemy);
         enemy.GetComponent<EnemyUI>().player = playerObject;

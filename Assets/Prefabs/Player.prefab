@@ -328,7 +328,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2455678244770574478}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -462,6 +462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapon: 2
+  audioManager: {fileID: 0}
   weaponName: 
   damage: 0
   fireRate: 0
@@ -480,6 +481,9 @@ MonoBehaviour:
   canBeHitLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
   bulletEffect: {fileID: 100002, guid: 580eaa56272e2704bbc0d5849b1a6b09, type: 3}
   pistolPrefab: {fileID: 4762727543820060643, guid: 3f4e3f697a6e15e45bfb169c4f786c0c, type: 3}
   machineGunPrefab: {fileID: 2103157691306413759, guid: 1fdfaf3ae2814164392f664a9693baf1, type: 3}
@@ -510,6 +514,8 @@ MonoBehaviour:
     ShotgunAccuracy: 0
     ShotgunMagSize: 0
     ShotgunReloadTime: 0
+  impactSoundRadius: 5
+  firingSoundRadius: 10
 --- !u!114 &3051186620677331434
 MonoBehaviour:
   m_ObjectHideFlags: 0

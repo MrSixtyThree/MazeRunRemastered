@@ -272,8 +272,11 @@ public class EnemyUI : MonoBehaviour
         }
     }
 
-    public void OnDestroy()
+    public void OnDisable()
     {
-        audioManager.GetComponent<AudioManager>().IsEnemyAlerted(false);
+        if (audioManager != null)
+        {
+            audioManager.GetComponent<AudioManager>().IsEnemyAlerted(false);
+        }
     }
 }
